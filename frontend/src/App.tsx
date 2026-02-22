@@ -1,8 +1,6 @@
-import { useState } from "react";
-
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-800 text-white">
       {/* Navbar */}
       <nav className="flex justify-between items-center px-8 py-6">
         <h1 className="text-2xl font-bold tracking-wide">Estate Vision</h1>
