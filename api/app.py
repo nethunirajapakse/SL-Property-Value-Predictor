@@ -44,7 +44,7 @@ COLOMBO_PREMIUM_AREAS = [
     "dehiwala", "mount lavinia",
 ]
 
-PROPERTY_TYPE_MAP = {"house": 0, "houses": 0, "apartment": 1, "apartments": 1, "land": 2}
+PROPERTY_TYPE_MAP = {"house": 0, "houses": 0, "apartment": 1, "apartments": 1}
 
 
 def encode_district(district_name):

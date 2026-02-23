@@ -187,7 +187,7 @@ plt.sca(axes[0,2]); plt.title("Price by District Tier")
 # Price by property type
 df_clean.boxplot(column="price_lkr", by="property_type_enc", ax=axes[1,0])
 axes[1,0].set_title("Price by Property Type")
-axes[1,0].set_xlabel("0=House, 1=Apartment, 2=Land")
+axes[1,0].set_xlabel("0=House, 1=Apartment")
 plt.sca(axes[1,0]); plt.title("Price by Property Type")
 
 # Bedrooms vs price

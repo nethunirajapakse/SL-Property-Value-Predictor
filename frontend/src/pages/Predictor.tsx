@@ -7,7 +7,7 @@ const DISTRICTS = [
   "Matara", "Kurunegala", "Ratnapura", "Negombo", "Other"
 ];
 
-const PROPERTY_TYPES = ["house", "apartment", "land"];
+const PROPERTY_TYPES = ["house", "apartment"];
 
 const AMENITIES = [
   { key: "has_parking",   label: "🚗 Parking",   },
