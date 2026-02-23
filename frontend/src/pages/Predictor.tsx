@@ -106,7 +106,7 @@ const predict = async () => {
         {/* ── PAGE HEADER ── */}
         <div className="mb-12">
           <p className="text-xs tracking-[0.3em] uppercase text-orange-500 font-semibold mb-3">AI Valuation Tool</p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-stone-900" style={{ fontFamily: "Syne, sans-serif" }}>
+          <h1 className="text-4xl md:text-6xl font-bold text-stone-900" style={{ fontFamily: "Syne, sans-serif" }}>
             Property Price<br />
             <span className="text-orange-500">Predictor</span>
           </h1>
@@ -237,7 +237,7 @@ const predict = async () => {
                 <div className="relative overflow-hidden bg-stone-900 rounded-3xl p-8 text-white shadow-2xl">
                   <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500 rounded-full blur-[80px] opacity-20 pointer-events-none" />
                   <p className="text-xs tracking-[0.3em] uppercase text-orange-400 font-semibold mb-4">Estimated Market Value</p>
-                  <div className="text-5xl font-extrabold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
+                  <div className="text-6xl font-bold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
                     Rs. {result.predicted_price_lkr.toLocaleString()}
                   </div>
                   <div className="text-orange-400 font-semibold text-lg">
