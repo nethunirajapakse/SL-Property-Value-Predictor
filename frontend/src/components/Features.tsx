@@ -4,7 +4,7 @@ const features = [
   {
     icon: <BarChart3 className="w-6 h-6 text-orange-600" />,
     title: "Accurate Predictions",
-    desc: "XGBoost and ensemble models deliver reliable valuations trained on thousands of verified Sri Lankan property listings.",
+    desc: "XGBoost and ensemble models deliver reliable valuations trained on verified Sri Lankan property listings.",
     bg: "bg-orange-50",
     border: "border-orange-200",
     iconBg: "bg-orange-100",
@@ -12,7 +12,7 @@ const features = [
   {
     icon: <MapPin className="w-6 h-6 text-amber-600" />,
     title: "Location Intelligence",
-    desc: "Granular analysis across all 25 districts — factoring proximity to schools, hospitals, transport, and commercial zones.",
+    desc: "Granular analysis across districts — factoring proximity to schools, hospitals, transport, and commercial zones.",
     bg: "bg-amber-50",
     border: "border-amber-200",
     iconBg: "bg-amber-100",
@@ -20,7 +20,7 @@ const features = [
   {
     icon: <Zap className="w-6 h-6 text-stone-600" />,
     title: "Data-Driven Insights",
-    desc: "Interactive dashboards reveal price trends, growth corridors, and yield forecasts across the Sri Lankan market.",
+    desc: "SHAP explainability reveals exactly which features drive your property's value — from location tier to amenities — in plain language.",
     bg: "bg-stone-50",
     border: "border-stone-200",
     iconBg: "bg-stone-100",

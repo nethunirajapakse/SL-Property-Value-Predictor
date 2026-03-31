@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
-CORS(app)  # allows React frontend to call this API
+CORS(app)  
 
 # ── LOAD MODEL FILES ───────────────────────────────────────────
 print("Loading model files...")
@@ -52,11 +52,9 @@ def encode_district(district_name):
     known = list(le.classes_)
     if district_name in known:
         return int(le.transform([district_name])[0])
-    # Find closest match
     for d in known:
         if d.lower() in district_name.lower():
             return int(le.transform([d])[0])
-    # Default to most common (Colombo=index of Colombo)
     return int(le.transform(["Colombo"])[0]) if "Colombo" in known else 0
 
 

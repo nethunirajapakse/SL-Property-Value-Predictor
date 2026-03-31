@@ -71,8 +71,8 @@ export default function Hero() {
           Value
         </h1>
         <p className="mt-6 text-base text-stone-500 leading-relaxed max-w-md animate-fade-up delay-400">
-          AI-powered valuations for Sri Lankan real estate — trained on
-          thousands of verified listings across all 25 districts.
+          AI-powered valuations for Sri Lankan real estate — trained on verified
+          listings across districts.
         </p>
         <div className="mt-10 flex flex-wrap gap-4 animate-fade-up delay-600">
           <button
@@ -111,14 +111,14 @@ export default function Hero() {
               key={i}
               className={`absolute bg-white rounded-3xl shadow-xl overflow-hidden border border-orange-50 ${h.rotate} ${h.float} transition-all duration-300 hover:shadow-2xl hover:shadow-orange-200/50 hover:z-50 hover:scale-105`}
               style={{
-                width: "55%", // Bigger cards
-                ...h.pos, // Applied scatter positions
+                width: "55%",
+                ...h.pos,
               }}
             >
               <img
                 src={h.img}
                 alt={h.label}
-                className="w-full h-40 object-cover" // Slightly taller image for bigger cards
+                className="w-full h-40 object-cover"
               />
               <div className="p-4">
                 <div className="flex items-center justify-between">

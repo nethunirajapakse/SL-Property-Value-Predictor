@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Cpu, CircleDollarSign } from "lucide-react"; // Import icons
+import { Home, Cpu, CircleDollarSign } from "lucide-react";
 
 const steps = [
   {
     num: "01",
     title: "Enter Property Details",
     desc: "Input location, size, property type, and key features like bedrooms, bathrooms, and lot area.",
-    icon: <Home className="w-8 h-8 text-orange-500" />, // Use component
+    icon: <Home className="w-8 h-8 text-orange-500" />,
   },
   {
     num: "02",
@@ -47,7 +47,7 @@ export default function HowItWorks() {
           {steps.map((step, i) => (
             <div key={i} className="flex flex-col items-center text-center">
               <div className="relative w-20 h-20 flex flex-col items-center justify-center rounded-full bg-white border-2 border-orange-200 shadow-md mb-6 z-10">
-                {step.icon} {/* Render the icon component directly */}
+                {step.icon}
                 <span className="text-xs font-bold text-white absolute -top-2 -right-2 bg-orange-500 w-6 h-6 rounded-full flex items-center justify-center text-[10px]">
                   {step.num}
                 </span>
@@ -64,7 +64,6 @@ export default function HowItWorks() {
             </div>
           ))}
         </div>
-        {/* ... rest of your code */}
       </div>
     </section>
   );
