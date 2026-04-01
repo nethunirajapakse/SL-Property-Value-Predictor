@@ -26,7 +26,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
-# ── LOGGING ────────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -37,7 +36,6 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ── CONFIG ─────────────────────────────────────────────────────────────────────
 CONFIG = {
     "categories": [
         ("houses",     "https://ikman.lk/en/ads/sri-lanka/houses-for-sale"),
@@ -45,7 +43,7 @@ CONFIG = {
         ("apartments", "https://ikman.lk/en/ads/sri-lanka/apartments-for-sale"),
     ],
     "max_pages_per_category": 40,
-    "page_delay":    (3, 5),
+    "page_delay":     (3, 5),
     "listing_delay": (2, 4),
     "output_file":   "raw_properties.csv",
     "url_file":      "listing_urls.txt",
@@ -53,7 +51,6 @@ CONFIG = {
     "headless": True,
 }
 
-# Attribute label → standard column name
 ATTR_ALIASES = {
     "bedrooms": "bedrooms", "bedroom": "bedrooms", "beds": "bedrooms",
     "no. of bedrooms": "bedrooms", "number of bedrooms": "bedrooms",
@@ -70,8 +67,6 @@ ATTR_ALIASES = {
     "furnishing": "furnishing",
 }
 
-
-# ── DRIVER ─────────────────────────────────────────────────────────────────────
 def build_driver():
     opts = Options()
     if CONFIG["headless"]:
@@ -94,12 +89,9 @@ def build_driver():
     )
     return driver
 
-
-# ── ATTRIBUTE PARSER ───────────────────────────────────────────────────────────
 def parse_attributes(soup):
     attrs = {}
 
-    # Strategy 1: elements whose text ends with ":"
     for el in soup.find_all(string=re.compile(r".+:\s*$")):
         label = el.strip().rstrip(":").strip().lower()
         std_key = ATTR_ALIASES.get(label)
@@ -120,7 +112,6 @@ def parse_attributes(soup):
                     attrs[std_key] = parts[i + 1].strip()
                     break
 
-    # Strategy 2: regex over full page text
     page_text = soup.get_text(separator="\n")
     for raw_label, std_key in ATTR_ALIASES.items():
         if std_key in attrs:
@@ -136,8 +127,6 @@ def parse_attributes(soup):
 
     return attrs
 
-
-# ── VALUE CLEANERS ─────────────────────────────────────────────────────────────
 def clean_price(raw):
     """
     'Rs 92,500,000'           → (92500000.0, False)
@@ -161,7 +150,6 @@ def clean_price(raw):
 
     return None, negotiable
 
-
 def extract_numeric(raw):
     """'4,500.0 sqft' → 4500.0  |  '10.6 perches' → 10.6  |  '4' → 4.0"""
     if not raw:
@@ -169,7 +157,6 @@ def extract_numeric(raw):
     s = str(raw).replace(",", "")
     nums = re.findall(r"[\d]+(?:\.[\d]+)?", s)
     return float(nums[0]) if nums else None
-
 
 def clean_land_size(raw):
     """
@@ -186,17 +173,14 @@ def clean_land_size(raw):
         return None, None
 
     if "acre" in s:
-        return round(num * 40, 4), "perches"      # 1 acre = 40 perches
+        return round(num * 40, 4), "perches"
     if "sq" in s or "sqft" in s or "square" in s:
-        return round(num / 272.25, 4), "perches"  # 1 perch = 272.25 sqft
+        return round(num / 272.25, 4), "perches"
     if "hectare" in s:
         return round(num * 395.37, 4), "perches"
-    # Default assume perches
     return num, "perches"
 
-
 def extract_storeys(raw_storeys, title):
-    """Try storeys_raw first, then infer from title."""
     if raw_storeys:
         n = extract_numeric(raw_storeys)
         if n:
@@ -213,11 +197,9 @@ def extract_storeys(raw_storeys, title):
         return 4
     return None
 
-
 def clean_location(raw):
     """'Piliyandala,' → 'Piliyandala'"""
     return str(raw).strip().rstrip(",").strip() if raw else ""
-
 
 DISTRICTS = [
     "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale",
@@ -228,9 +210,7 @@ DISTRICTS = [
     "Monaragala", "Ratnapura", "Kegalle", "Negombo",
 ]
 
-# Sub-areas → their parent district (for accurate district mapping)
 AREA_TO_DISTRICT = {
-    # Colombo district
     "piliyandala": "Colombo", "kalubowila": "Colombo", "dematagoda": "Colombo",
     "dehiwala": "Colombo", "maharagama": "Colombo", "nugegoda": "Colombo",
     "boralesgamuwa": "Colombo", "kesbewa": "Colombo", "athurugiriya": "Colombo",
@@ -244,23 +224,18 @@ AREA_TO_DISTRICT = {
     "colombo 7": "Colombo", "colombo 8": "Colombo", "colombo 9": "Colombo",
     "colombo 10": "Colombo", "colombo 11": "Colombo", "colombo 12": "Colombo",
     "colombo 13": "Colombo", "colombo 14": "Colombo", "colombo 15": "Colombo",
-    # Gampaha district
     "negombo": "Gampaha", "wattala": "Gampaha", "ja-ela": "Gampaha",
     "seeduwa": "Gampaha", "kandana": "Gampaha", "ragama": "Gampaha",
     "gampaha": "Gampaha", "veyangoda": "Gampaha", "nittambuwa": "Gampaha",
     "minuwangoda": "Gampaha", "mirigama": "Gampaha", "divulapitiya": "Gampaha",
     "katana": "Gampaha", "kelaniya": "Gampaha", "peliyagoda": "Gampaha",
-    # Kalutara district
     "kalutara": "Kalutara", "panadura": "Kalutara", "beruwala": "Kalutara",
     "aluthgama": "Kalutara", "bandaragama": "Kalutara", "horana": "Kalutara",
     "ingiriya": "Kalutara", "matugama": "Kalutara",
-    # Kandy district
     "kandy": "Kandy", "peradeniya": "Kandy", "katugastota": "Kandy",
     "kundasale": "Kandy", "ampitiya": "Kandy", "digana": "Kandy",
-    # Galle district
     "galle": "Galle", "hikkaduwa": "Galle", "unawatuna": "Galle",
     "ambalangoda": "Galle", "elpitiya": "Galle", "bentota": "Galle",
-    # Matara district
     "matara": "Matara", "weligama": "Matara", "mirissa": "Matara",
     "dickwella": "Matara", "tangalle": "Matara",
 }
@@ -276,31 +251,25 @@ def extract_district_from_location(location, url=""):
     loc_lower = location.lower().strip()
     url_lower = url.lower()
 
-    # 1. Check location directly against district names
     for d in DISTRICTS:
         if loc_lower == d.lower() or loc_lower.startswith(d.lower()):
             return d, location
 
-    # 2. Check location against known sub-area map
     for area, district in AREA_TO_DISTRICT.items():
         if area in loc_lower:
             return district, location
 
-    # 3. Extract from URL slug (most reliable)
-    # URL ends with: -for-sale-colombo or -for-sale-gampaha etc.
     for d in DISTRICTS:
         if f"-{d.lower()}" in url_lower or f"/{d.lower()}" in url_lower:
             return d, location
 
     return "Other", location
 
-
 def get_description(soup):
     """
     Get the actual property description — avoid nav/footer text.
     ikman puts the description in a div with class containing 'description'.
     """
-    # Try specific class first
     for sel in ["div.description--2-ez3", "[class*='description--']", "[class*='_description']"]:
         el = soup.select_one(sel)
         if el:
@@ -308,10 +277,8 @@ def get_description(soup):
             if len(text) > 30:
                 return text[:800]
 
-    # Fallback: find the longest <p> block that isn't nav
     candidates = []
     for tag in soup.find_all(["p", "div"]):
-        # Skip nav, header, footer, sidebar
         parents = [p.name for p in tag.parents]
         if any(x in parents for x in ["nav", "header", "footer", "aside"]):
             continue
@@ -324,8 +291,6 @@ def get_description(soup):
 
     return ""
 
-
-# ── URL COLLECTION ─────────────────────────────────────────────────────────────
 def collect_urls(driver, base_url, category_name, max_pages):
     urls = []
     for page in range(1, max_pages + 1):
@@ -352,8 +317,6 @@ def collect_urls(driver, base_url, category_name, max_pages):
             log.error(f"  [{category_name}] Page {page} failed: {e}")
     return list(set(urls))
 
-
-# ── SINGLE LISTING SCRAPER ─────────────────────────────────────────────────────
 def scrape_listing(driver, url, property_type):
     try:
         driver.get(url)
@@ -363,7 +326,6 @@ def scrape_listing(driver, url, property_type):
         time.sleep(random.uniform(*CONFIG["listing_delay"]))
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # ── Raw fields ─────────────────────────────────────────
         h1       = soup.find("h1")
         title    = h1.get_text(strip=True) if h1 else ""
 
@@ -380,7 +342,6 @@ def scrape_listing(driver, url, property_type):
 
         attrs    = parse_attributes(soup)
 
-        # ── Clean & transform ──────────────────────────────────
         price_val, is_negotiable = clean_price(price_raw)
         land_val, _              = clean_land_size(attrs.get("land_size_raw", ""))
         floor_val                = extract_numeric(attrs.get("floor_area_raw", ""))
@@ -392,28 +353,22 @@ def scrape_listing(driver, url, property_type):
         description              = get_description(soup)
 
         data = {
-            # Identifiers
-            "url":            url,
-            "property_type":  property_type,
-            "scraped_at":     datetime.now().strftime("%Y-%m-%d %H:%M"),
-            # Text fields
-            "title":          title,
-            "description":    description,
-            # Price
-            "price_lkr":      price_val,        # numeric, e.g. 92500000.0
-            "negotiable":     int(is_negotiable),
-            # Location
-            "location":       location,          # e.g. "Piliyandala"
-            "district":       district,          # e.g. "Colombo"
-            "area":           area,              # e.g. "Piliyandala"
-            # Size features — all numeric
-            "bedrooms":       beds,              # e.g. 4.0
-            "bathrooms":      baths,             # e.g. 2.0
-            "land_size_p":    land_val,          # in perches, e.g. 10.6
-            "floor_area_sqft":floor_val,         # in sqft, e.g. 4500.0
-            "storeys":        storeys,           # e.g. 3
-            # Furnishing
-            "furnishing":     attrs.get("furnishing", ""),
+            "url":             url,
+            "property_type":   property_type,
+            "scraped_at":      datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "title":           title,
+            "description":     description,
+            "price_lkr":       price_val,
+            "negotiable":      int(is_negotiable),
+            "location":        location,
+            "district":        district,
+            "area":            area,
+            "bedrooms":        beds,
+            "bathrooms":       baths,
+            "land_size_p":     land_val,
+            "floor_area_sqft": floor_val,
+            "storeys":         storeys,
+            "furnishing":      attrs.get("furnishing", ""),
         }
 
         log.info(
@@ -426,16 +381,12 @@ def scrape_listing(driver, url, property_type):
         log.error(f"  ✗ {url} — {e}")
         return None
 
-
-# ── CHECKPOINT SAVE ────────────────────────────────────────────────────────────
 def save_checkpoint(records, filepath):
     if not records:
         return
     pd.DataFrame(records).to_csv(filepath, index=False, encoding="utf-8-sig")
     log.info(f"  💾 Checkpoint: {len(records)} records → {filepath}")
 
-
-# ── MAIN ───────────────────────────────────────────────────────────────────────
 def main():
     log.info("=" * 65)
     log.info("  ikman.lk Property Scraper — Final Version")
@@ -446,7 +397,6 @@ def main():
     records  = []
 
     try:
-        # PHASE 1: Collect listing URLs
         log.info("\n📋 PHASE 1: Collecting URLs...")
         for cat_name, cat_url in CONFIG["categories"]:
             log.info(f"\n  Category: {cat_name}")
@@ -455,7 +405,6 @@ def main():
                 all_urls.append((u, cat_name))
             log.info(f"  → {len(urls)} unique URLs")
 
-        # Deduplicate
         seen, deduped = set(), []
         for url, ptype in all_urls:
             if url not in seen:
@@ -468,7 +417,6 @@ def main():
             for url, ptype in all_urls:
                 f.write(f"{url}\t{ptype}\n")
 
-        # PHASE 2: Scrape each listing
         log.info("\n🔍 PHASE 2: Scraping listings...")
         for i, (url, ptype) in enumerate(all_urls, 1):
             log.info(f"\n  [{i}/{len(all_urls)}]")
@@ -488,7 +436,6 @@ def main():
         driver.quit()
         save_checkpoint(records, CONFIG["output_file"])
         log.info(f"\n🎉 Done! {len(records)} listings → {CONFIG['output_file']}")
-
 
 if __name__ == "__main__":
     main()

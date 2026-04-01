@@ -26,28 +26,18 @@ print("=" * 55)
 df = pd.read_csv("raw_properties.csv")
 print(f"\n✅ Loaded: {df.shape[0]} rows × {df.shape[1]} columns")
 
-# ═══════════════════════════════════════════════════════
-# 1. DROP USELESS COLUMNS & BAD ROWS
-# ═══════════════════════════════════════════════════════
-# Drop furnishing — 598/601 are null, useless for model
 df.drop(columns=["furnishing"], inplace=True)
 
-# Drop rows with no price (can't train without target)
 df.dropna(subset=["price_lkr"], inplace=True)
 print(f"  After dropping null prices: {len(df)} rows")
 
-# Drop rows with no location
 df.dropna(subset=["location"], inplace=True)
 print(f"  After dropping null location: {len(df)} rows")
 
-# ═══════════════════════════════════════════════════════
-# 2. PRICE FILTERING — remove outliers
-# ═══════════════════════════════════════════════════════
 before = len(df)
 df = df[df["price_lkr"].between(500_000, 600_000_000)]
 print(f"  After price filter (Rs.500K–600M): {len(df)} rows (removed {before - len(df)})")
 
-# Log-transform price — reduces skewness, improves model
 df["log_price"] = np.log1p(df["price_lkr"])
 
 print(f"\n  Price stats:")
@@ -55,9 +45,6 @@ print(f"    Min:    Rs. {df['price_lkr'].min():>15,.0f}")
 print(f"    Median: Rs. {df['price_lkr'].median():>15,.0f}")
 print(f"    Max:    Rs. {df['price_lkr'].max():>15,.0f}")
 
-# ═══════════════════════════════════════════════════════
-# 3. MISSING VALUE IMPUTATION
-# ═══════════════════════════════════════════════════════
 df["bedrooms"]       = df["bedrooms"].fillna(df["bedrooms"].median())
 df["bathrooms"]      = df["bathrooms"].fillna(df["bathrooms"].median())
 df["land_size_p"]    = df["land_size_p"].fillna(df["land_size_p"].median())
@@ -66,16 +53,10 @@ df["storeys"]        = df["storeys"].fillna(df["storeys"].median())
 
 print(f"\n✅ Missing values imputed")
 
-# ═══════════════════════════════════════════════════════
-# 4. CAP EXTREME VALUES (winsorise at 99th percentile)
-# ═══════════════════════════════════════════════════════
 for col in ["bedrooms", "bathrooms", "land_size_p", "floor_area_sqft"]:
     cap = df[col].quantile(0.99)
     df[col] = df[col].clip(upper=cap)
 
-# ═══════════════════════════════════════════════════════
-# 5. DISTRICT TIER — location quality score
-# ═══════════════════════════════════════════════════════
 DISTRICT_TIERS = {
     "Colombo": 1,
     "Gampaha": 2, "Kalutara": 2, "Kandy": 2, "Galle": 2, "Matara": 2,
@@ -98,27 +79,18 @@ df["colombo_premium"] = df["location"].str.lower().apply(
     lambda x: int(any(p in str(x) for p in PREMIUM))
 )
 
-# ═══════════════════════════════════════════════════════
-# 6. ENCODE DISTRICT
-# ═══════════════════════════════════════════════════════
 le = LabelEncoder()
 df["district_enc"] = le.fit_transform(df["district"].fillna("Other"))
 joblib.dump(le, "district_encoder.pkl")
 print(f"\n✅ District encoder saved")
 print(f"   Districts found: {list(le.classes_)}")
 
-# ═══════════════════════════════════════════════════════
-# 7. ENCODE PROPERTY TYPE
-# ═══════════════════════════════════════════════════════
 TYPE_MAP = {"houses": 0, "house": 0, "apartments": 1, "apartment": 1, "land": 2}
 df["property_type_enc"] = df["property_type"].str.lower().map(TYPE_MAP).fillna(0).astype(int)
 
 print(f"\n   Property type distribution:")
 print(df["property_type"].value_counts().to_string())
 
-# ═══════════════════════════════════════════════════════
-# 8. AMENITY FEATURES FROM DESCRIPTION
-# ═══════════════════════════════════════════════════════
 AMENITIES = {
     "has_parking":   ["parking", "garage", "car port", "carport"],
     "has_pool":      ["pool", "swimming"],
@@ -140,9 +112,6 @@ print(f"\n✅ Amenity features extracted:")
 for feat in AMENITIES:
     print(f"   {feat:<20} {df[feat].sum():>4} listings ({df[feat].mean()*100:.1f}%)")
 
-# ═══════════════════════════════════════════════════════
-# 9. FINAL FEATURE SET
-# ═══════════════════════════════════════════════════════
 FEATURES = [
     "bedrooms", "bathrooms", "land_size_p", "floor_area_sqft", "storeys",
     "district_enc", "district_tier", "colombo_premium", "property_type_enc",
@@ -160,9 +129,6 @@ joblib.dump(FEATURES, "feature_names.pkl")
 print(f"✅ Saved → clean_properties.csv")
 print(f"✅ Saved → feature_names.pkl")
 
-# ═══════════════════════════════════════════════════════
-# 10. EDA PLOTS
-# ═══════════════════════════════════════════════════════
 fig, axes = plt.subplots(2, 3, figsize=(16, 10))
 fig.suptitle("Sri Lanka Property Price — EDA", fontsize=14, fontweight="bold")
 
