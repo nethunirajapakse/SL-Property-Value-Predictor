@@ -14,7 +14,7 @@ EstateVision is a **full-stack AI property valuation system** for the Sri Lankan
 ![EstateVision Demo](./docs/demo.gif)
 *Enter property details → See predicted value → Explore SHAP insights.*
 
-<img width="full" height="full" alt="0628(1)" src="https://github.com/user-attachments/assets/20264c7d-057a-44a7-99fc-744bbfc1e254" />
+<img width="970" height="480" alt="0628(1) (1)" src="https://github.com/user-attachments/assets/9e3535ae-c51f-459e-9fcc-77cb06123cd8" />
 
 
 ---
